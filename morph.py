@@ -1,8 +1,3 @@
-'''
-This is a test commit.
-'''
-
-
 import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
