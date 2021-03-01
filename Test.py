@@ -11,8 +11,8 @@ im_sz = 512
 # Map size
 mp_sz = 512
 
-warp_scale = 0.05
-mult_scale = 0.95
+warp_scale = 0.9
+mult_scale = 0.1
 add_scale = 0.0
 add_first = False
 
