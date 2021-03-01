@@ -9,11 +9,11 @@ TRAIN_EPOCHS = 100
 # Image size (square)
 im_sz = 512
 # Map size
-mp_sz = 20
+mp_sz = 96
 
 warp_scale = 0.05
-mult_scale = 0.75
-add_scale = 0.0
+mult_scale = 0.4
+add_scale = 0.4
 add_first = False
 
 
