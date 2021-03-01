@@ -12,8 +12,8 @@ im_sz = 512
 mp_sz = 512
 
 warp_scale = 0.05
-mult_scale = 0.0
-add_scale = 0.95
+mult_scale = 0.95
+add_scale = 0.0
 add_first = False
 
 
