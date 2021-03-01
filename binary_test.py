@@ -101,7 +101,7 @@ def produce_warp_maps(origins, targets):
 
         train_loss(loss)
 
-    maps = create_grid(im_sz)
+    maps = create_grid(im_sz[0])
     maps = np.concatenate((maps, origins * 0.1, targets * 0.1), axis=-1).astype(np.float32)
 
     template = 'Epoch {}, Loss: {}'
