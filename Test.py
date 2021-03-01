@@ -4,7 +4,7 @@ import tensorflow_addons as tfa
 import cv2
 import argparse
 
-TRAIN_EPOCHS = 100
+TRAIN_EPOCHS = 1000
 
 # Image size (square)
 im_sz = 512
