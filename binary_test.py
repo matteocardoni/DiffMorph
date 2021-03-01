@@ -6,7 +6,10 @@ import argparse
 
 TRAIN_EPOCHS = 100
 
-im_sz = (768,1024)
+image_size = (768,1024)
+height = image_size[0]
+width = image_size[1]
+
 #im_sz = 512
 mp_sz = 96
 
@@ -46,8 +49,11 @@ def warp(origins, targets, preds_org, preds_trg):
     return res_targets, res_origins
 
 
-def create_grid(scale):
-    grid = np.mgrid[0:scale, 0:scale] / (scale - 1) * 2 - 1
+def create_grid(width, height):
+    # Create a grid of the dimensions of the images
+    grid = np.mgrid[0:width, 0:width]
+    # Scale the grid in height
+    grid = grid / (width - 1) * 2 - 1
     grid = np.swapaxes(grid, 0, 2)
     grid = np.expand_dims(grid, axis=0)
     return grid
@@ -101,7 +107,7 @@ def produce_warp_maps(origins, targets):
 
         train_loss(loss)
 
-    maps = create_grid(im_sz[0])
+    maps = create_grid(width,height)
     maps = np.concatenate((maps, origins * 0.1, targets * 0.1), axis=-1).astype(np.float32)
 
     template = 'Epoch {}, Loss: {}'
@@ -230,20 +236,20 @@ if __name__ == "__main__":
     #dom_a = cv2.imread(args.source, cv2.IMREAD_COLOR)
     dom_a = cv2.imread("Test_image_without_leak_scaled.png", cv2.IMREAD_COLOR)
     dom_a = cv2.cvtColor(dom_a, cv2.COLOR_BGR2RGB)
-    dom_a = cv2.resize(dom_a, (im_sz[1], im_sz[0]), interpolation=cv2.INTER_AREA)
+    dom_a = cv2.resize(dom_a, (width, height), interpolation=cv2.INTER_AREA)
     #dom_a = cv2.resize(dom_a, (im_sz, im_sz), interpolation=cv2.INTER_AREA)
     dom_a = dom_a / 127.5 - 1
 
     #dom_b = cv2.imread(args.target, cv2.IMREAD_COLOR)
     dom_b = cv2.imread("Test_image_scaled.png", cv2.IMREAD_COLOR)
     dom_b = cv2.cvtColor(dom_b, cv2.COLOR_BGR2RGB)
-    dom_b = cv2.resize(dom_b, (im_sz[1], im_sz[0]), interpolation=cv2.INTER_AREA)
+    dom_b = cv2.resize(dom_b, (width, height), interpolation=cv2.INTER_AREA)
     #dom_b = cv2.resize(dom_b, (im_sz, im_sz), interpolation=cv2.INTER_AREA)
     dom_b = dom_b / 127.5 - 1
 
-    origins = dom_a.reshape(1, im_sz[1], im_sz[0], 3).astype(np.float32)
+    origins = dom_a.reshape(1, width, height, 3).astype(np.float32)
     #origins = dom_a.reshape(1, im_sz, im_sz, 3).astype(np.float32)
-    targets = dom_b.reshape(1, im_sz[1], im_sz[0], 3).astype(np.float32)
+    targets = dom_b.reshape(1, width, height, 3).astype(np.float32)
     #targets = dom_b.reshape(1, im_sz, im_sz, 3).astype(np.float32)
 
     produce_warp_maps(origins, targets)
