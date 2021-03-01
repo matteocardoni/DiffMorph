@@ -67,7 +67,6 @@ def produce_warp_maps(origins, targets):
             self.convo = tf.keras.layers.Conv2D((3 + 3 + 2) * 2, (5, 5))
 
         def call(self, maps):
-            maps_ndarray = maps.numpy()
             x = tf.image.resize(maps, [mp_sz, mp_sz])
             x = self.conv1(x)
             x = self.act1(x)
@@ -128,16 +127,10 @@ def produce_warp_maps(origins, targets):
 
             # preds is a Tensor of dimensions (1,84,84 16)
             preds = model(maps, training=False)[:1]
-            preds_ndarray = preds.numpy()
             # Resize preds to a tensor of shape (1,im_sz, im_sz, 3)
             preds = tf.image.resize(preds, [im_sz, im_sz])
-            preds_ndarray = preds.numpy()
             res_targets, res_origins = warp(origins, targets, preds[..., :8], preds[..., 8:])
             # res_targets and res_origins are Tensors of shape (1,im_sz, im_sz,3)
-            res_targets_test = res_targets.numpy()
-            res_origins_test = res_origins.numpy()
-            print("preds[..., :8] is ", preds[..., :8])
-            print("preds[..., 8:] is ", preds[..., 8:])
 
             res_targets = tf.clip_by_value(res_targets, -1, 1)[0]
             res_img = ((res_targets.numpy() + 1) * 127.5).astype(np.uint8)
