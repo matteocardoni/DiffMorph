@@ -161,15 +161,15 @@ def use_warp_maps(origins, targets):
     preds = np.load('preds.npy')
 
     # save maps as images
-    res_img = np.zeros((im_sz * 2, im_sz * 3, 3))
+    res_img = np.zeros((height * 2, width * 3, 3))
 
-    res_img[im_sz * 0:im_sz * 1, im_sz * 0:im_sz * 1] = preds[0, :, :, 0:3]  # a_to_b add map
-    res_img[im_sz * 0:im_sz * 1, im_sz * 1:im_sz * 2] = preds[0, :, :, 3:6]  # a_to_b mult map
-    res_img[im_sz * 0:im_sz * 1, im_sz * 2:im_sz * 3, :2] = preds[0, :, :, 6:8]  # a_to_b warp map
+    res_img[height * 0:height * 1, width * 0:width * 1] = preds[0, :, :, 0:3]  # a_to_b add map
+    res_img[height * 0:height * 1, width * 1:width * 2] = preds[0, :, :, 3:6]  # a_to_b mult map
+    res_img[height * 0:height * 1, width * 2:width * 3, :2] = preds[0, :, :, 6:8]  # a_to_b warp map
 
-    res_img[im_sz * 1:im_sz * 2, im_sz * 0:im_sz * 1] = preds[0, :, :, 8:11]  # b_to_a add map
-    res_img[im_sz * 1:im_sz * 2, im_sz * 1:im_sz * 2] = preds[0, :, :, 11:14]  # b_to_a mult map
-    res_img[im_sz * 1:im_sz * 2, im_sz * 2:im_sz * 3, :2] = preds[0, :, :, 14:16]  # b_to_a warp map
+    res_img[height * 1:height * 2, width * 0:width * 1] = preds[0, :, :, 8:11]  # b_to_a add map
+    res_img[height * 1:height * 2, width * 1:width * 2] = preds[0, :, :, 11:14]  # b_to_a mult map
+    res_img[height * 1:height * 2, width * 2:width * 3, :2] = preds[0, :, :, 14:16]  # b_to_a warp map
 
     res_img = np.clip(res_img, -1, 1)
     res_img = ((res_img + 1) * 127.5).astype(np.uint8)
@@ -181,7 +181,8 @@ def use_warp_maps(origins, targets):
     trg_strength = tf.reverse(org_strength, axis=[0])
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    video = cv2.VideoWriter('morph/morph.mp4', fourcc, 48, (im_sz, im_sz))
+    video = cv2.VideoWriter('morph/morph.mp4', fourcc, 48, (height, width))
+    '''
     img_a = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_a_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
@@ -192,7 +193,7 @@ def use_warp_maps(origins, targets):
         preds_org = preds * org_strength[i]
         preds_trg = preds * trg_strength[i]
 
-        res_targets, res_origins = warp(origins, targets, preds_org[..., :8], preds_trg[..., 8:])
+        res_targets, res_origins = warp(origins, targets, preds[..., :8], preds_trg[..., 8:])
         res_targets = tf.clip_by_value(res_targets, -1, 1)
         res_origins = tf.clip_by_value(res_origins, -1, 1)
 
@@ -214,6 +215,7 @@ def use_warp_maps(origins, targets):
 
     cv2.destroyAllWindows()
     video.release()
+    '''
     print('Result video saved.')
 
 
@@ -271,4 +273,4 @@ if __name__ == "__main__":
     #targets = dom_b.reshape(1, im_sz, im_sz, 3).astype(np.float32)
 
     produce_warp_maps(origins, targets)
-    #use_warp_maps(origins, targets)
+    use_warp_maps(origins, targets)
