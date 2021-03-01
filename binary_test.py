@@ -187,8 +187,8 @@ def use_warp_maps(origins, targets):
     img_a = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_a_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
-    '''
     res_img = np.zeros((im_sz * 3, im_sz * (STEPS // 10), 3), dtype=np.uint8)
+    '''
 
     for i in range(STEPS):
         preds_org = preds * org_strength[i]
@@ -211,9 +211,9 @@ def use_warp_maps(origins, targets):
             res_img[im_sz * 2:im_sz * 3, i // 10 * im_sz: (i // 10 + 1) * im_sz] = (
                         (res_origins.numpy()[0] + 1) * 127.5).astype(np.uint8)
             print('Image #%d produced.' % (i + 1))
-        '''
+        
     cv2.imwrite("morph/result.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
-
+    '''
     cv2.destroyAllWindows()
     video.release()
     print('Result video saved.')
