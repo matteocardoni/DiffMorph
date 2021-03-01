@@ -9,11 +9,11 @@ TRAIN_EPOCHS = 100
 # Image size (square)
 im_sz = 512
 # Map size
-mp_sz = 512
+mp_sz = 96
 
 warp_scale = 0.05
-mult_scale = 0.4
-add_scale = 0.4
+mult_scale = 0.05
+add_scale = 0.75
 add_first = False
 
 
@@ -39,8 +39,6 @@ def warp(origins, targets, preds_org, preds_trg):
             origins * tf.maximum(0.1, 1 + preds_org[:, :, :, 0:3] * mult_scale) + preds_org[:, :, :,
                                                                                   3:6] * 2 * add_scale,
             preds_org[:, :, :, 6:8] * im_sz * warp_scale)
-        print("preds_org[:,:,:,0:3] is ", preds_org[:, :, :, 0:3])
-        print("preds_org[:,:,:,3:6] is ", preds_org[:, :, :, 3:6])
         res_origins = tfa.image.dense_image_warp(
             targets * tf.maximum(0.1, 1 + preds_trg[:, :, :, 0:3] * mult_scale) + preds_trg[:, :, :,
                                                                                   3:6] * 2 * add_scale,
