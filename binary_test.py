@@ -6,7 +6,8 @@ import argparse
 
 TRAIN_EPOCHS = 100
 
-im_sz = (768,1024)
+#im_sz = (768,1024)
+im_sz = 512
 mp_sz = 96
 
 warp_scale = 0.05
