@@ -173,6 +173,7 @@ def use_warp_maps(origins, targets):
     print ('Result video saved.')    
         
 if __name__ == "__main__":
+    # Parser for command line options
     parser = argparse.ArgumentParser()
     parser.add_argument("-s", "--source", help="Source file name", default = None)
     parser.add_argument("-t", "--target", help="Target file name", default = None)
