@@ -194,7 +194,7 @@ def use_warp_maps(origins, targets):
         preds_org = preds * org_strength[i]
         preds_trg = preds * trg_strength[i]
 
-        res_targets, res_origins = warp(origins, targets, preds[..., :8], preds_trg[..., 8:])
+        res_targets, res_origins = warp(origins, targets, preds_org[..., :8], preds_trg[..., 8:])
         res_targets = tf.clip_by_value(res_targets, -1, 1)
         res_origins = tf.clip_by_value(res_origins, -1, 1)
 

@@ -174,7 +174,6 @@ def use_warp_maps(origins, targets):
     img_a = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_a_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
-    
     res_img = np.zeros((im_sz * 3, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     '''
     for i in range(STEPS):
@@ -239,12 +238,12 @@ if __name__ == "__main__":
     add_first = args.add_first
     '''
 
-    dom_a = cv2.imread("images/img_1.jpg", cv2.IMREAD_COLOR)
+    dom_a = cv2.imread("images/Test_image_without_leak_scaled.png", cv2.IMREAD_COLOR)
     dom_a = cv2.cvtColor(dom_a, cv2.COLOR_BGR2RGB)
     dom_a = cv2.resize(dom_a, (im_sz, im_sz), interpolation=cv2.INTER_AREA)
     dom_a = dom_a / 127.5 - 1
 
-    dom_b = cv2.imread("images/img_2.jpg", cv2.IMREAD_COLOR)
+    dom_b = cv2.imread("images/Test_image_scaled.png", cv2.IMREAD_COLOR)
     dom_b = cv2.cvtColor(dom_b, cv2.COLOR_BGR2RGB)
     dom_b = cv2.resize(dom_b, (im_sz, im_sz), interpolation=cv2.INTER_AREA)
     dom_b = dom_b / 127.5 - 1
