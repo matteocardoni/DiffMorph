@@ -271,4 +271,4 @@ if __name__ == "__main__":
     #targets = dom_b.reshape(1, im_sz, im_sz, 3).astype(np.float32)
 
     produce_warp_maps(origins, targets)
-    use_warp_maps(origins, targets)
+    #use_warp_maps(origins, targets)
