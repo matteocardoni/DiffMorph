@@ -126,6 +126,7 @@ def produce_warp_maps(origins, targets):
         if (epoch < 100 and epoch % 10 == 0) or \
                 (epoch < 1000 and epoch % 100 == 0) or \
                 (epoch % 1000 == 0):
+            print("Epoch: ", epoch)
             preds = model(maps, training=False)[:1]
             preds = tf.image.resize(preds, [height, width])
             preds_ndarray = preds.numpy()
@@ -214,8 +215,8 @@ def use_warp_maps(origins, targets):
     cv2.imwrite("morph/result.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
 
     cv2.destroyAllWindows()
-    video.release()
     '''
+    video.release()
     print('Result video saved.')
 
 
