@@ -230,17 +230,21 @@ if __name__ == "__main__":
     #dom_a = cv2.imread(args.source, cv2.IMREAD_COLOR)
     dom_a = cv2.imread("Test_image_without_leak_scaled.png", cv2.IMREAD_COLOR)
     dom_a = cv2.cvtColor(dom_a, cv2.COLOR_BGR2RGB)
-    dom_a = cv2.resize(dom_a, (im_sz[0], im_sz[1]), interpolation=cv2.INTER_AREA)
+    #dom_a = cv2.resize(dom_a, (im_sz[0], im_sz[1]), interpolation=cv2.INTER_AREA)
+    dom_a = cv2.resize(dom_a, (im_sz, im_sz), interpolation=cv2.INTER_AREA)
     dom_a = dom_a / 127.5 - 1
 
     #dom_b = cv2.imread(args.target, cv2.IMREAD_COLOR)
     dom_b = cv2.imread("Test_image_scaled.png", cv2.IMREAD_COLOR)
     dom_b = cv2.cvtColor(dom_b, cv2.COLOR_BGR2RGB)
-    dom_b = cv2.resize(dom_b, (im_sz[0], im_sz[1]), interpolation=cv2.INTER_AREA)
+    #dom_b = cv2.resize(dom_b, (im_sz[0], im_sz[1]), interpolation=cv2.INTER_AREA)
+    dom_b = cv2.resize(dom_b, (im_sz, im_sz), interpolation=cv2.INTER_AREA)
     dom_b = dom_b / 127.5 - 1
 
-    origins = dom_a.reshape(1, im_sz[0], im_sz[1], 3).astype(np.float32)
-    targets = dom_b.reshape(1, im_sz[0], im_sz[1], 3).astype(np.float32)
+    #origins = dom_a.reshape(1, im_sz[0], im_sz[1], 3).astype(np.float32)
+    origins = dom_a.reshape(1, im_sz, im_sz, 3).astype(np.float32)
+    #targets = dom_b.reshape(1, im_sz[0], im_sz[1], 3).astype(np.float32)
+    targets = dom_b.reshape(1, im_sz, im_sz, 3).astype(np.float32)
 
     produce_warp_maps(origins, targets)
     use_warp_maps(origins, targets)
