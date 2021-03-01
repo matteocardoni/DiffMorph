@@ -183,7 +183,6 @@ def use_warp_maps(origins, targets):
 
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     video = cv2.VideoWriter('morph/morph.mp4', fourcc, 48, (height, width))
-    '''
     img_a = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_a_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
@@ -203,7 +202,7 @@ def use_warp_maps(origins, targets):
 
         img = ((res_numpy[i] + 1) * 127.5).astype(np.uint8)
         video.write(cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
-
+        '''
         if (i + 1) % 10 == 0:
             res_img[im_sz * 0:im_sz * 1, i // 10 * im_sz: (i // 10 + 1) * im_sz] = img
             res_img[im_sz * 1:im_sz * 2, i // 10 * im_sz: (i // 10 + 1) * im_sz] = (
@@ -211,11 +210,10 @@ def use_warp_maps(origins, targets):
             res_img[im_sz * 2:im_sz * 3, i // 10 * im_sz: (i // 10 + 1) * im_sz] = (
                         (res_origins.numpy()[0] + 1) * 127.5).astype(np.uint8)
             print('Image #%d produced.' % (i + 1))
-
+        '''
     cv2.imwrite("morph/result.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
 
     cv2.destroyAllWindows()
-    '''
     video.release()
     print('Result video saved.')
 
