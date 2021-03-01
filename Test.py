@@ -228,7 +228,7 @@ if __name__ == "__main__":
         print("No target file provided!")
         exit()
     '''
-    TRAIN_EPOCHS = 100
+
     '''
     add_scale = args.add_scale
     mult_scale = args.mult_scale
