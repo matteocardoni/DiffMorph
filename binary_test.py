@@ -4,49 +4,90 @@ import tensorflow_addons as tfa
 import cv2
 import argparse
 
+start_image = "Test_image_without_leak_scaled.png"
+end_image = "Test_image_scaled.png"
+integer_to_float_scaling = 127.5
+integer_to_float_bias = -1
+binary_threshold = 0.5
+value_if_greater_than_threshold = 255
+binary_save_format = ".png"
+RGB_save_format = ".jpg"
+video_fps = 48
+video_format = 'mp4v'
+
+binary_images = False
 TRAIN_EPOCHS = 100
 
-image_size = (768,1024)
-height = image_size[0]
-width = image_size[1]
-
+image_size = (768, 1024)
 # Map size
-map_size = (768,1024)
-map_height = map_size[0]
-map_width = map_size[1]
+map_size = (768, 1024)
+
 
 warp_scale = 0.05
 mult_scale = 0.4
 add_scale = 0.4
 add_first = False
 
+height = image_size[0]
+width = image_size[1]
+
+map_height = map_size[0]
+map_width = map_size[1]
 
 @tf.function
 def warp(origins, targets, preds_org, preds_trg):
     if add_first:
-        res_targets = tfa.image.dense_image_warp((origins + preds_org[:, :, :, 3:6] * 2 * add_scale) * tf.maximum(0.1,
-                                                                                                                  1 + preds_org[
-                                                                                                                      :,
-                                                                                                                      :,
-                                                                                                                      :,
-                                                                                                                      0:3] * mult_scale),
-                                                 preds_org[:, :, :, 6:8] * width * warp_scale)
-        res_origins = tfa.image.dense_image_warp((targets + preds_trg[:, :, :, 3:6] * 2 * add_scale) * tf.maximum(0.1,
-                                                                                                                  1 + preds_trg[
-                                                                                                                      :,
-                                                                                                                      :,
-                                                                                                                      :,
-                                                                                                                      0:3] * mult_scale),
-                                                 preds_trg[:, :, :, 6:8] * width * warp_scale)
+        if binary_images:
+            res_targets = tfa.image.dense_image_warp(
+                (origins + preds_org[:, :, :, 1:2] * 2 * add_scale) * tf.maximum(0.1,
+                                                                                 1 + preds_org[
+                                                                                     :,
+                                                                                     :,
+                                                                                     :,
+                                                                                     0:1] * mult_scale),
+                preds_org[:, :, :, 2:4] * height * warp_scale)
+            res_origins = tfa.image.dense_image_warp(
+                (targets + preds_trg[:, :, :, 1:2] * 2 * add_scale) * tf.maximum(0.1,
+                                                                                 1 + preds_trg[
+                                                                                     :,
+                                                                                     :,
+                                                                                     :,
+                                                                                     0:1] * mult_scale),
+                preds_trg[:, :, :, 2:4] * height * warp_scale)
+        else:
+            res_targets = tfa.image.dense_image_warp((origins + preds_org[:, :, :, 3:6] * 2 * add_scale) * tf.maximum(0.1,
+                                                                                                                      1 + preds_org[
+                                                                                                                          :,
+                                                                                                                          :,
+                                                                                                                          :,
+                                                                                                                          0:3] * mult_scale),
+                                                     preds_org[:, :, :, 6:8] * height * warp_scale)
+            res_origins = tfa.image.dense_image_warp((targets + preds_trg[:, :, :, 3:6] * 2 * add_scale) * tf.maximum(0.1,
+                                                                                                                      1 + preds_trg[
+                                                                                                                          :,
+                                                                                                                          :,
+                                                                                                                          :,
+                                                                                                                          0:3] * mult_scale),
+                                                     preds_trg[:, :, :, 6:8] * height * warp_scale)
     else:
-        res_targets = tfa.image.dense_image_warp(
-            origins * tf.maximum(0.1, 1 + preds_org[:, :, :, 0:3] * mult_scale) + preds_org[:, :, :,
-                                                                                  3:6] * 2 * add_scale,
-            preds_org[:, :, :, 6:8] * height * warp_scale)
-        res_origins = tfa.image.dense_image_warp(
-            targets * tf.maximum(0.1, 1 + preds_trg[:, :, :, 0:3] * mult_scale) + preds_trg[:, :, :,
-                                                                                  3:6] * 2 * add_scale,
-            preds_trg[:, :, :, 6:8] * height * warp_scale)
+        if binary_images:
+            res_targets = tfa.image.dense_image_warp(
+                origins * tf.maximum(0.1, 1 + preds_org[:, :, :, 0:1] * mult_scale) + preds_org[:, :, :,
+                                                                                      1:2] * 2 * add_scale,
+                preds_org[:, :, :, 2:4] * height * warp_scale)
+            res_origins = tfa.image.dense_image_warp(
+                targets * tf.maximum(0.1, 1 + preds_trg[:, :, :, 0:1] * mult_scale) + preds_trg[:, :, :,
+                                                                                      1:2] * 2 * add_scale,
+                preds_trg[:, :, :, 2:4] * height * warp_scale)
+        else:
+            res_targets = tfa.image.dense_image_warp(
+                origins * tf.maximum(0.1, 1 + preds_org[:, :, :, 0:3] * mult_scale) + preds_org[:, :, :,
+                                                                                      3:6] * 2 * add_scale,
+                preds_org[:, :, :, 6:8] * height * warp_scale)
+            res_origins = tfa.image.dense_image_warp(
+                targets * tf.maximum(0.1, 1 + preds_trg[:, :, :, 0:3] * mult_scale) + preds_trg[:, :, :,
+                                                                                      3:6] * 2 * add_scale,
+                preds_trg[:, :, :, 6:8] * height * warp_scale)
 
     return res_targets, res_origins
 
@@ -74,7 +115,10 @@ def produce_warp_maps(origins, targets):
             self.act1 = tf.keras.layers.LeakyReLU(alpha=0.2)
             self.conv2 = tf.keras.layers.Conv2D(64, (5, 5))
             self.act2 = tf.keras.layers.LeakyReLU(alpha=0.2)
-            self.convo = tf.keras.layers.Conv2D((3 + 3 + 2) * 2, (5, 5))
+            if binary_images:
+                self.convo = tf.keras.layers.Conv2D(1 + 1 + 2) * 2, (5,5)
+            else:
+                self.convo = tf.keras.layers.Conv2D((3 + 3 + 2) * 2, (5, 5))
 
         def call(self, maps):
             x = tf.image.resize(maps, [map_height, map_width])
@@ -100,11 +144,18 @@ def produce_warp_maps(origins, targets):
 
             # a = tf.random.uniform([maps.shape[0]])
             # res_targets, res_origins = warp(origins, targets, preds[..., :8] * a, preds[...,8:] * (1 - a))
-            res_targets_, res_origins_ = warp(origins, targets, preds[..., :8], preds[..., 8:])
+            if binary_images:
+                res_targets_, res_origins_ = warp(origins, targets, preds[:, :, :, 0:1], preds[:, :, :, 4:8])
 
-            res_map = tfa.image.dense_image_warp(maps, preds[:, :, :,
-                                                       6:8] * height * warp_scale)  # warp maps consistency checker
-            res_map = tfa.image.dense_image_warp(res_map, preds[:, :, :, 14:16] * height * warp_scale)
+                res_map = tfa.image.dense_image_warp(maps, preds[:, :, :,
+                                                           2:4] * height * warp_scale)  # warp maps consistency checker
+                res_map = tfa.image.dense_image_warp(res_map, preds[:, :, :, 6:8] * height * warp_scale)
+            else:
+                res_targets_, res_origins_ = warp(origins, targets, preds[:, :, :, 0:8], preds[:, :, :, 8:16])
+
+                res_map = tfa.image.dense_image_warp(maps, preds[:, :, :,
+                                                           6:8] * height * warp_scale)  # warp maps consistency checker
+                res_map = tfa.image.dense_image_warp(res_map, preds[:, :, :, 14:16] * height * warp_scale)
 
             loss = loss_object(maps, res_map) * 1 + loss_object(res_targets_, targets) * 0.3 + loss_object(res_origins_,
                                                                                                            origins) * 0.3
@@ -143,38 +194,72 @@ def produce_warp_maps(origins, targets):
                                                                                       11:14] * 2 * add_scale,
                 preds[:, :, :, 14:16] * width * warp_scale)
             '''
-            res_targets, res_origins = warp(origins, targets, preds[:, :, :, 0:8], preds[:, :, :, 8:16])
+            if binary_images:
+                res_targets, res_origins = warp(origins, targets, preds[:, :, :, 0:4], preds[:, :, :, 4:8])
+            else:
+                res_targets, res_origins = warp(origins, targets, preds[:, :, :, 0:8], preds[:, :, :, 8:16])
 
+            # Clip images for values out of [-1,1]
             res_targets = tf.clip_by_value(res_targets, -1, 1)[0]
-            res_img = ((res_targets.numpy() + 1) * 127.5).astype(np.uint8)
-            cv2.imwrite("train/a_to_b_%d.jpg" % epoch, cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
-
             res_origins = tf.clip_by_value(res_origins, -1, 1)[0]
-            res_img = ((res_origins.numpy() + 1) * 127.5).astype(np.uint8)
-            cv2.imwrite("train/b_to_a_%d.jpg" % epoch, cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
+            # Convert the images to uint8
+            res_targets = ((res_targets.numpy() - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
+            res_origins= ((res_origins.numpy() - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
+            if binary_images:
+                # Binarize the images. Mininum value:0, maximum value: value_if_greater_than_threshold
+                cv2.threshold(res_targets, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+                cv2.threshold(res_origins, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+                # Save the images
+                cv2.imwrite("train/a_to_b_%d" + binary_save_format % epoch, res_targets)
+                cv2.imwrite("train/b_to_a_%d" + binary_save_format % epoch, res_origins)
+            else:
+                # Save the image converting from RGB order to BGR order
+                cv2.imwrite("train/a_to_b_%d" + RGB_save_format % epoch, cv2.cvtColor(res_targets, cv2.COLOR_RGB2BGR))
+                cv2.imwrite("train/b_to_a_%d" + RGB_save_format % epoch, cv2.cvtColor(res_origins, cv2.COLOR_RGB2BGR))
 
             np.save('preds.npy', preds.numpy())
-
 
 def use_warp_maps(origins, targets):
     STEPS = 101
 
     preds = np.load('preds.npy')
 
-    # save maps as images
-    res_img = np.zeros((height * 2, width * 3, 3))
 
-    res_img[height * 0:height * 1, width * 0:width * 1] = preds[0, :, :, 0:3]  # a_to_b add map
-    res_img[height * 0:height * 1, width * 1:width * 2] = preds[0, :, :, 3:6]  # a_to_b mult map
-    res_img[height * 0:height * 1, width * 2:width * 3, :2] = preds[0, :, :, 6:8]  # a_to_b warp map
 
-    res_img[height * 1:height * 2, width * 0:width * 1] = preds[0, :, :, 8:11]  # b_to_a add map
-    res_img[height * 1:height * 2, width * 1:width * 2] = preds[0, :, :, 11:14]  # b_to_a mult map
-    res_img[height * 1:height * 2, width * 2:width * 3, :2] = preds[0, :, :, 14:16]  # b_to_a warp map
-
+    # Clip for values outside [-1,1]
     res_img = np.clip(res_img, -1, 1)
-    res_img = ((res_img + 1) * 127.5).astype(np.uint8)
-    cv2.imwrite("morph/maps.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
+    # Convert to uint8
+    res_img = ((res_img - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
+    if binary_images:
+        # save maps as images
+        res_img = np.zeros((height * 2, width * 3, 1))
+
+        res_img[height * 0:height * 1, width * 0:width * 1] = preds[0, :, :, 0:1]  # a_to_b add map
+        res_img[height * 0:height * 1, width * 1:width * 2] = preds[0, :, :, 1:2]  # a_to_b mult map
+        res_img[height * 0:height * 1, width * 2:width * 3, :2] = preds[0, :, :, 2:4]  # a_to_b warp map
+
+        res_img[height * 1:height * 2, width * 0:width * 1] = preds[0, :, :, 4:5]  # b_to_a add map
+        res_img[height * 1:height * 2, width * 1:width * 2] = preds[0, :, :, 5:6]  # b_to_a mult map
+        res_img[height * 1:height * 2, width * 2:width * 3, :2] = preds[0, :, :, 6:8]  # b_to_a warp map
+
+        # Binarize
+        cv2.threshold(res_img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+        # Save
+        cv2.imwrite("morph/maps" + binary_save_format, res_img)
+    else:
+        # save maps as images
+        res_img = np.zeros((height * 2, width * 3, 3))
+
+        res_img[height * 0:height * 1, width * 0:width * 1] = preds[0, :, :, 0:3]  # a_to_b add map
+        res_img[height * 0:height * 1, width * 1:width * 2] = preds[0, :, :, 3:6]  # a_to_b mult map
+        res_img[height * 0:height * 1, width * 2:width * 3, :2] = preds[0, :, :, 6:8]  # a_to_b warp map
+
+        res_img[height * 1:height * 2, width * 0:width * 1] = preds[0, :, :, 8:11]  # b_to_a add map
+        res_img[height * 1:height * 2, width * 1:width * 2] = preds[0, :, :, 11:14]  # b_to_a mult map
+        res_img[height * 1:height * 2, width * 2:width * 3, :2] = preds[0, :, :, 14:16]  # b_to_a warp map
+
+        # Save
+        cv2.imwrite("morph/maps" + RGB_save_format, cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
 
     # apply maps and save results
 
@@ -182,9 +267,9 @@ def use_warp_maps(origins, targets):
     trg_strength = tf.reverse(org_strength, axis=[0])
 
     # Set the video format
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    # width must be the first argument for the shape
-    video = cv2.VideoWriter('morph/morph.mp4', fourcc, 48, (width, height))
+    fourcc = cv2.VideoWriter_fourcc(* video_format)
+    # Settings for the video. width must be the first argument for the shape
+    video = cv2.VideoWriter('morph/morph.mp4', fourcc, video_fps, (width, height))
     '''
     img_a = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
@@ -196,15 +281,26 @@ def use_warp_maps(origins, targets):
         preds_org = preds * org_strength[i]
         preds_trg = preds * trg_strength[i]
 
-        res_targets, res_origins = warp(origins, targets, preds_org[:, :, :, 0:8], preds_trg[:, :, :, 8:16])
+        if binary_images:
+            res_targets, res_origins = warp(origins, targets, preds_org[:, :, :, 0:4], preds_trg[:, :, :, 4:8])
+        else:
+            res_targets, res_origins = warp(origins, targets, preds_org[:, :, :, 0:8], preds_trg[:, :, :, 8:16])
         res_targets = tf.clip_by_value(res_targets, -1, 1)
         res_origins = tf.clip_by_value(res_origins, -1, 1)
 
         results = res_targets * trg_strength[i] + res_origins * org_strength[i]
         res_numpy = results.numpy()
 
-        img = ((res_numpy + 1) * 127.5).astype(np.uint8)
-        video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
+        # Convert to uint8
+        img = ((res_numpy - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
+        if binary_images:
+            # Binarize
+            cv2.threshold(img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+            # Write image to video
+            video.write(np.squeeze(img))
+        else:
+            # Write image to video converting from RGB order to BGR order
+            video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
         '''
         if (i + 1) % 10 == 0:
             res_img[im_sz * 0:im_sz * 1, i // 10 * im_sz: (i // 10 + 1) * im_sz] = img
@@ -217,6 +313,7 @@ def use_warp_maps(origins, targets):
     cv2.imwrite("morph/result.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
     '''
     cv2.destroyAllWindows()
+    # Close video writer
     video.release()
     print('Result video saved.')
 
@@ -255,17 +352,22 @@ if __name__ == "__main__":
     add_first = args.add_first
     '''
 
-    dom_a = cv2.imread("Test_image_without_leak_scaled.png", cv2.IMREAD_COLOR)
-    # Since the color order in cv2.imread is BGR (blue, green, red) the order of the ndarray is changed in RGB
-    dom_a = cv2.cvtColor(dom_a, cv2.COLOR_BGR2RGB)
-    dom_a = dom_a / 127.5 - 1
-    origins = dom_a.reshape(1, height, width, 3).astype(np.float32)
-
-    dom_b = cv2.imread("Test_image_scaled.png", cv2.IMREAD_COLOR)
-    # Since the color order in cv2.imread is BGR (blue, green, red) the order of the ndarray is changed in RGB
-    dom_b = cv2.cvtColor(dom_b, cv2.COLOR_BGR2RGB)
-    dom_b = dom_b / 127.5 - 1
-    targets = dom_b.reshape(1, height, width, 3).astype(np.float32)
+    # Load the images
+    if binary_images:
+        dom_a = cv2.imread(start_image, cv2.IMREAD_GRAYSCALE)
+        dom_b = cv2.imread(end_image, cv2.IMREAD_GRAYSCALE)
+    else:
+        dom_a = cv2.imread(start_image, cv2.IMREAD_COLOR)
+        dom_b = cv2.imread(end_image, cv2.IMREAD_COLOR)
+        # Since the color order in cv2.imread is BGR (blue, green, red) the order of the ndarray is changed in RGB
+        dom_a = cv2.cvtColor(dom_a, cv2.COLOR_BGR2RGB)
+        dom_b = cv2.cvtColor(dom_b, cv2.COLOR_BGR2RGB)
+    # Scale the images
+    dom_a = dom_a / integer_to_float_scaling + integer_to_float_bias
+    dom_b = dom_b / integer_to_float_scaling + integer_to_float_bias
+    # Reshape and convert to float32
+    origins = np.expand_dims(dom_a, axis=0).astype(np.float32)
+    targets = np.expand_dims(dom_b, axis=0).astype(np.float32)
 
     produce_warp_maps(origins, targets)
     use_warp_maps(origins, targets)
