@@ -20,7 +20,7 @@ video_fps = 48
 video_format = 'mp4v'
 images_to_generate = 100
 TRAIN_EPOCHS = 100
-warp_scale = 0.3
+warp_scale = 0.2
 mult_scale = 0.0
 add_scale = 0.0
 add_first = False
@@ -297,9 +297,9 @@ def use_warp_maps(origins, targets):
         img = ((res_numpy - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
         if binary_images:
             # Binarize
-            retVal, img_binary = cv2.threshold(np.squeeze(img), binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+            retVal, img = cv2.threshold(np.squeeze(img), binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
             # Save image
-            cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img_binary)
+            cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img)
             # Write image to video
             video.write(img)
         else:
