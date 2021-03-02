@@ -20,7 +20,7 @@ video_fps = 48
 video_format = 'mp4v'
 images_to_generate = 100
 TRAIN_EPOCHS = 100
-warp_scale = 0.5
+warp_scale = 0.005
 mult_scale = 0.0
 add_scale = 0.0
 add_first = False
@@ -154,8 +154,8 @@ def produce_warp_maps(origins, targets):
                                                            6:8] * height * warp_scale)  # warp maps consistency checker
                 res_map = tfa.image.dense_image_warp(res_map, preds[:, :, :, 14:16] * height * warp_scale)
 
-            loss = loss_object(maps, res_map) * 1 + loss_object(res_targets_, targets) * 1 + loss_object(res_origins_,
-                                                                                                           origins) * 1
+            loss = loss_object(maps, res_map) * 1 + loss_object(res_targets_, targets) * 0.3 + loss_object(res_origins_,
+                                                                                                           origins) * 0.3
 
         gradients = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
