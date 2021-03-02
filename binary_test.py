@@ -15,7 +15,7 @@ RGB_save_format = ".jpg"
 video_fps = 48
 video_format = 'mp4v'
 
-binary_images = True
+binary_images = False
 TRAIN_EPOCHS = 100
 
 image_size = (768, 1024)
@@ -226,10 +226,7 @@ def use_warp_maps(origins, targets):
 
 
 
-    # Clip for values outside [-1,1]
-    res_img = np.clip(res_img, -1, 1)
-    # Convert to uint8
-    res_img = ((res_img - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
+
     if binary_images:
         # save maps as images
         res_img = np.zeros((height * 2, width * 3, 1))
@@ -242,6 +239,10 @@ def use_warp_maps(origins, targets):
         res_img[height * 1:height * 2, width * 1:width * 2] = preds[0, :, :, 5:6]  # b_to_a mult map
         res_img[height * 1:height * 2, width * 2:width * 3, :2] = preds[0, :, :, 6:8]  # b_to_a warp map
 
+        # Clip for values outside [-1,1]
+        res_img = np.clip(res_img, -1, 1)
+        # Convert to uint8
+        res_img = ((res_img - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
         # Binarize
         cv2.threshold(res_img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
         # Save
@@ -258,6 +259,10 @@ def use_warp_maps(origins, targets):
         res_img[height * 1:height * 2, width * 1:width * 2] = preds[0, :, :, 11:14]  # b_to_a mult map
         res_img[height * 1:height * 2, width * 2:width * 3, :2] = preds[0, :, :, 14:16]  # b_to_a warp map
 
+        # Clip for values outside [-1,1]
+        res_img = np.clip(res_img, -1, 1)
+        # Convert to uint8
+        res_img = ((res_img - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
         # Save
         cv2.imwrite("morph/maps.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
 
