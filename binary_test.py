@@ -274,7 +274,7 @@ def use_warp_maps(origins, targets):
     if binary_images:
         video = cv2.VideoWriter('morph/morph.mp4', fourcc, video_fps, (width, height), isColor=False)
     else:
-        video = cv2.VideoWriter('morph/morph.mp4', fourcc, video_fps, (width, height), isColor = True)
+        video = cv2.VideoWriter('morph/morph.mp4', fourcc, video_fps, (width, height), isColor=True)
     '''
     img_a = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
@@ -299,6 +299,7 @@ def use_warp_maps(origins, targets):
 
         # Convert to uint8
         img = ((res_numpy - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
+        print(img.shape)
         if binary_images:
             # Binarize
             retVal, img = cv2.threshold(img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
