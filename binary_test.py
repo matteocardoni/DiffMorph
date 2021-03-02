@@ -145,7 +145,7 @@ def produce_warp_maps(origins, targets):
             # a = tf.random.uniform([maps.shape[0]])
             # res_targets, res_origins = warp(origins, targets, preds[..., :8] * a, preds[...,8:] * (1 - a))
             if binary_images:
-                res_targets_, res_origins_ = warp(origins, targets, preds[:, :, :, 0:1], preds[:, :, :, 4:8])
+                res_targets_, res_origins_ = warp(origins, targets, preds[:, :, :, 0:4], preds[:, :, :, 4:8])
 
                 res_map = tfa.image.dense_image_warp(maps, preds[:, :, :,
                                                            2:4] * height * warp_scale)  # warp maps consistency checker
