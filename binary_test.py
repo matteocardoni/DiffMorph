@@ -2,7 +2,8 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
 import cv2
-import argparse
+import os
+import shutil
 
 
 # Parameters choice
@@ -317,6 +318,8 @@ def use_warp_maps(origins, targets):
         
     cv2.imwrite("morph/result.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
     '''
+    shutil.make_archive("morph/morph_images.zip", 'zip', "morph/morphed/images/")
+    print("Images zip folder created")
     cv2.destroyAllWindows()
     # Close video writer
     video.release()
