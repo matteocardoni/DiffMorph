@@ -274,9 +274,9 @@ if __name__ == "__main__":
     dom_b = dom_b / 127.5 - 1
 
     origins = dom_a.reshape(1, height, width, 3).astype(np.float32)
-    skimage.io.imshow(origins)
+    skimage.io.imshow(np.squeeze(origins))
     targets = dom_b.reshape(1, height, width, 3).astype(np.float32)
-    skimage.io.imshow(targets)
+    skimage.io.imshow(np.squeeze(targets))
 
     produce_warp_maps(origins, targets)
     use_warp_maps(origins, targets)
