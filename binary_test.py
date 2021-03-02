@@ -13,14 +13,14 @@ image_size = (768, 1024)
 map_size = (768, 1024)
 integer_to_float_scaling = 127.5
 integer_to_float_bias = -1
-binary_threshold = 127  #in scale [0,255]
+binary_threshold = 50  #in scale [0,255]
 value_if_greater_than_threshold = 255
 video_fps = 48
 video_format = 'mp4v'
 images_to_generate = 101
 TRAIN_EPOCHS = 100
 warp_scale = 0.1
-mult_scale = 0.4
+mult_scale = 0.0
 add_scale = 0.0
 add_first = False
 
