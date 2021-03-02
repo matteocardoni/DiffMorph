@@ -20,7 +20,7 @@ video_fps = 48
 video_format = 'mp4v'
 images_to_generate = 100
 TRAIN_EPOCHS = 100
-warp_scale = 0.1
+warp_scale = 0.3
 mult_scale = 0.0
 add_scale = 0.0
 add_first = False
@@ -297,16 +297,16 @@ def use_warp_maps(origins, targets):
         img = ((res_numpy - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
         if binary_images:
             # Binarize
-            retVal, img = cv2.threshold(np.squeeze(img), binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+            retVal, img_binary = cv2.threshold(np.squeeze(img), binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
             # Save image
-            cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img)
+            cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img_binary)
             # Write image to video
             video.write(img)
         else:
             # Save image converting from RGB order to BGR order
             cv2.imwrite("morph/morph_images/image_" + str(i) + ".jpg", cv2.cvtColor(np.squeeze(img), cv2.COLOR_BGR2RGB))
-            # Write image to video converting from RGB order to BGR order
-            video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
+        # Write image to video converting from RGB order to BGR order
+        video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
         '''
         if (i + 1) % 10 == 0:
             res_img[im_sz * 0:im_sz * 1, i // 10 * im_sz: (i // 10 + 1) * im_sz] = img
