@@ -302,19 +302,15 @@ def use_warp_maps(origins, targets):
         if binary_images:
             # Binarize
             retVal, img = cv2.threshold(img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
-            # Convert the image frmo shape (1,heigth, width,1) to (heigth, width,1)
-            img_squeezed = np.squeeze(img)
             # Save image
-            cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img_squeezed)
+            cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img)
             # Write image to video
-            video.write(img_squeezed)
+            video.write(img)
         else:
-            # Convert the image frmo shape (1,heigth, width, 3) to (heigth, width, 3)
-            img_squeezed = np.squeeze(img)
             # Save image converting from RGB order to BGR order
-            cv2.imwrite("morph/morph_images/image_" + str(i) + ".jpg", cv2.cvtColor(img_squeezed, cv2.COLOR_BGR2RGB))
+            cv2.imwrite("morph/morph_images/image_" + str(i) + ".jpg", cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
             # Write image to video converting from RGB order to BGR order
-            video.write(cv2.cvtColor(img_squeezed, cv2.COLOR_RGB2BGR))
+            video.write(cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
         '''
         if (i + 1) % 10 == 0:
             res_img[im_sz * 0:im_sz * 1, i // 10 * im_sz: (i // 10 + 1) * im_sz] = img
