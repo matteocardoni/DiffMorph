@@ -24,9 +24,9 @@ image_size = (768, 1024)
 map_size = (768, 1024)
 
 
-warp_scale = 0.05
-mult_scale = 0.4
-add_scale = 0.4
+warp_scale = 0.1
+mult_scale = 0.0
+add_scale = 0.0
 add_first = False
 
 height = image_size[0]
@@ -354,7 +354,7 @@ if __name__ == "__main__":
     '''
 
     #TRAIN_EPOCHS = args.train_epochs
-    TRAIN_EPOCHS = 100
+
     '''
     add_scale = args.add_scale
     mult_scale = args.mult_scale
