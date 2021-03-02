@@ -186,7 +186,8 @@ def use_warp_maps(origins, targets):
 
     # Set the video format
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    video = cv2.VideoWriter('morph/morph.mp4', fourcc, 48, (height, width))
+    # width must be the first argument for the shape
+    video = cv2.VideoWriter('morph/morph.mp4', fourcc, 48, (width, height))
     '''
     img_a = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
@@ -273,7 +274,9 @@ if __name__ == "__main__":
     dom_b = dom_b / 127.5 - 1
 
     origins = dom_a.reshape(1, height, width, 3).astype(np.float32)
+    skimage.io.imshow(origins)
     targets = dom_b.reshape(1, height, width, 3).astype(np.float32)
+    skimage.io.imshow(targets)
 
     produce_warp_maps(origins, targets)
     use_warp_maps(origins, targets)
