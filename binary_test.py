@@ -17,7 +17,7 @@ video_format = 'mp4v'
 images_to_generate = 101
 
 binary_images = True
-TRAIN_EPOCHS = 100
+TRAIN_EPOCHS = 20
 
 image_size = (768, 1024)
 # Map size
@@ -301,11 +301,11 @@ def use_warp_maps(origins, targets):
         img = ((res_numpy - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
         if binary_images:
             # Binarize
-            retVal, img = cv2.threshold(img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+            retVal, img = cv2.threshold(np.squeeze(img), binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
             # Save image
-            cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", np.squeeze(img))
+            cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img)
             # Write image to video
-            video.write(np.squeeze(img))
+            video.write(img)
         else:
             # Save image converting from RGB order to BGR order
             cv2.imwrite("morph/morph_images/image_" + str(i) + ".jpg", cv2.cvtColor(np.squeeze(img), cv2.COLOR_BGR2RGB))
