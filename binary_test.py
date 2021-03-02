@@ -210,6 +210,7 @@ def produce_warp_maps(origins, targets):
                 # Binarize the images. Mininum value:0, maximum value: value_if_greater_than_threshold
                 res_targets = cv2.threshold(res_targets, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
                 res_origins = cv2.threshold(res_origins, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+                print(res_targets)
                 # Save the images
                 cv2.imwrite("train/a_to_b_" + str(epoch) + ".png", res_targets)
                 cv2.imwrite("train/b_to_a_" + str(epoch) + ".png", res_origins)
