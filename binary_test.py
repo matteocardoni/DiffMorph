@@ -210,11 +210,11 @@ def produce_warp_maps(origins, targets):
                 # Binarize the images. Mininum value:0, maximum value: value_if_greater_than_threshold
                 cv2.threshold(res_targets, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
                 cv2.threshold(res_origins, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+                print("targets histogram: ",np.histogram(res_targets), "targets dtype: ", res_targets.dtype)
+                print("origins histogram: ",np.histogram(res_origins), "origins dtype: ", res_targets.dtype)
                 # Save the images
                 cv2.imwrite("train/a_to_b_%d.png" % epoch, res_targets)
                 cv2.imwrite("train/b_to_a_%d.png" % epoch, res_origins)
-                print("targets histogram: ",np.histogram(res_targets))
-                print("origins histogram: ",np.histogram(res_origins))
             else:
                 # Save the image converting from RGB order to BGR order
                 cv2.imwrite("train/a_to_b_%d.jpg" % epoch, cv2.cvtColor(res_targets, cv2.COLOR_RGB2BGR))
