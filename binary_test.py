@@ -202,17 +202,22 @@ def produce_warp_maps(origins, targets):
             # Clip images for values out of [-1,1]
             res_targets = tf.clip_by_value(res_targets, -1, 1)[0]
             res_origins = tf.clip_by_value(res_origins, -1, 1)[0]
-            # Convert the images to uint8
-            res_targets = ((res_targets.numpy() - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
-            res_origins= ((res_origins.numpy() - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
             if binary_images:
                 # Binarize the images. Mininum value:0, maximum value: value_if_greater_than_threshold
                 cv2.threshold(res_targets, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
                 cv2.threshold(res_origins, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+                # Convert the images to uint8
+                res_targets = (res_targets.numpy()).astype(np.unit8)
+                res_origins = (res_origins.numpy()).astype(np.unit8)
                 # Save the images
                 cv2.imwrite("train/a_to_b_%d.png" % epoch, res_targets)
                 cv2.imwrite("train/b_to_a_%d.png" % epoch, res_origins)
             else:
+                # Convert the images to uint8
+                res_targets = ((res_targets.numpy() - integer_to_float_bias) * integer_to_float_scaling).astype(
+                    np.uint8)
+                res_origins = ((res_origins.numpy() - integer_to_float_bias) * integer_to_float_scaling).astype(
+                    np.uint8)
                 # Save the image converting from RGB order to BGR order
                 cv2.imwrite("train/a_to_b_%d.jpg" % epoch, cv2.cvtColor(res_targets, cv2.COLOR_RGB2BGR))
                 cv2.imwrite("train/b_to_a_%d.jpg" % epoch, cv2.cvtColor(res_origins, cv2.COLOR_RGB2BGR))
@@ -223,9 +228,6 @@ def use_warp_maps(origins, targets):
     STEPS = 101
 
     preds = np.load('preds.npy')
-
-
-
 
     if binary_images:
         '''
@@ -300,14 +302,16 @@ def use_warp_maps(origins, targets):
         results = res_targets * trg_strength[i] + res_origins * org_strength[i]
         res_numpy = results.numpy()
 
-        # Convert to uint8
-        img = ((res_numpy - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
         if binary_images:
             # Binarize
             cv2.threshold(img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+            # Convert to uint8
+            img = res_numpy.astype(np.uint8)
             # Write image to video
             video.write(np.squeeze(img))
         else:
+            # Convert to uint8
+            img = ((res_numpy - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
             # Write image to video converting from RGB order to BGR order
             video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
         '''
