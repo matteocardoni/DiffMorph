@@ -228,6 +228,7 @@ def use_warp_maps(origins, targets):
 
 
     if binary_images:
+        '''
         # save maps as images
         res_img = np.zeros((height * 2, width * 3, 1))
 
@@ -265,7 +266,7 @@ def use_warp_maps(origins, targets):
         res_img = ((res_img - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
         # Save
         cv2.imwrite("morph/maps.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
-
+        '''
     # apply maps and save results
 
     org_strength = tf.reshape(tf.range(STEPS, dtype=tf.float32), [STEPS, 1, 1, 1]) / (STEPS - 1)
