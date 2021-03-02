@@ -208,7 +208,7 @@ def use_warp_maps(origins, targets):
 
         img = ((res_numpy + 1) * 127.5).astype(np.uint8)
         skimage.io.imshow(np.squeeze(img))
-        video.write(cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
+        video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
         '''
         if (i + 1) % 10 == 0:
             res_img[im_sz * 0:im_sz * 1, i // 10 * im_sz: (i // 10 + 1) * im_sz] = img
