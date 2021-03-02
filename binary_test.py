@@ -181,6 +181,7 @@ def use_warp_maps(origins, targets):
     org_strength = tf.reshape(tf.range(STEPS, dtype=tf.float32), [STEPS, 1, 1, 1]) / (STEPS - 1)
     trg_strength = tf.reverse(org_strength, axis=[0])
 
+    # Set the video format
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     video = cv2.VideoWriter('morph/morph.mp4', fourcc, 48, (height, width))
     '''
@@ -194,7 +195,7 @@ def use_warp_maps(origins, targets):
         preds_org = preds * org_strength[i]
         preds_trg = preds * trg_strength[i]
 
-        res_targets, res_origins = warp(origins, targets, preds_org[..., :8], preds_trg[..., 8:])
+        res_targets, res_origins = warp(origins, targets, preds_org[:, :, :, 0:8], preds_trg[:, :, :, 8:16])
         res_targets = tf.clip_by_value(res_targets, -1, 1)
         res_origins = tf.clip_by_value(res_origins, -1, 1)
 
