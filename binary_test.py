@@ -19,7 +19,7 @@ value_if_greater_than_threshold = 255
 video_fps = 48
 video_format = 'mp4v'
 images_to_generate = 101
-TRAIN_EPOCHS = 20
+TRAIN_EPOCHS = 100
 warp_scale = 0.1
 mult_scale = 0.0
 add_scale = 0.0
@@ -318,7 +318,7 @@ def use_warp_maps(origins, targets):
         
     cv2.imwrite("morph/result.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
     '''
-    shutil.make_archive("morph/morph_images.zip", 'zip', "morph/morph_images/")
+    shutil.make_archive("morph/morph_images", 'zip', "morph/morph_images/")
     print("Images zip folder created")
     cv2.destroyAllWindows()
     # Close video writer
