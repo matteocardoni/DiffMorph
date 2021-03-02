@@ -4,35 +4,29 @@ import tensorflow_addons as tfa
 import cv2
 import argparse
 
-# Parameter choice
+
+# Parameters choice
 start_image = "Test_image_without_leak_scaled.png"
 end_image = "Test_image_scaled.png"
+binary_images = True
+image_size = (768, 1024)
+map_size = (768, 1024)
 integer_to_float_scaling = 127.5
 integer_to_float_bias = -1
 binary_threshold = 127  #in scale [0,255]
 value_if_greater_than_threshold = 255
-binary_save_format = ".png"
-RGB_save_format = ".jpg"
 video_fps = 48
 video_format = 'mp4v'
 images_to_generate = 101
-
-binary_images = True
 TRAIN_EPOCHS = 100
-
-image_size = (768, 1024)
-# Map size
-map_size = (768, 1024)
-
-
 warp_scale = 0.1
-mult_scale = 0.0
+mult_scale = 0.4
 add_scale = 0.0
 add_first = False
 
+
 height = image_size[0]
 width = image_size[1]
-
 map_height = map_size[0]
 map_width = map_size[1]
 
