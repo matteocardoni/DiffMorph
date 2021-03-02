@@ -265,7 +265,7 @@ def use_warp_maps(origins, targets):
         '''
     # apply maps and save results
 
-    org_strength = tf.reshape(tf.range(STEPS, dtype=tf.float32), [STEPS, 1, 1, 1]) / (STEPS - 1)
+    org_strength = tf.reshape(tf.range(images_to_generate, dtype=tf.float32), [images_to_generate, 1, 1, 1]) / (images_to_generate - 1)
     trg_strength = tf.reverse(org_strength, axis=[0])
 
     # Set the video format
