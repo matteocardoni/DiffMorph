@@ -16,7 +16,7 @@ video_fps = 48
 video_format = 'mp4v'
 images_to_generate = 101
 
-binary_images = False
+binary_images = True
 TRAIN_EPOCHS = 100
 
 image_size = (768, 1024)
