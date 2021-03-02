@@ -15,7 +15,7 @@ RGB_save_format = ".jpg"
 video_fps = 48
 video_format = 'mp4v'
 
-binary_images = False
+binary_images = True
 TRAIN_EPOCHS = 100
 
 image_size = (768, 1024)
