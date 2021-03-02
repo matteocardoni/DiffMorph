@@ -202,7 +202,7 @@ def use_warp_maps(origins, targets):
         res_targets = tf.clip_by_value(res_targets, -1, 1)
         res_origins = tf.clip_by_value(res_origins, -1, 1)
 
-        results = res_targets * trg_strength + res_origins * org_strength
+        results = res_targets * trg_strength[i] + res_origins * org_strength[i]
         res_numpy = results.numpy()
 
         img = ((res_numpy + 1) * 127.5).astype(np.uint8)
