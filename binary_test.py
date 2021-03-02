@@ -2,8 +2,6 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
 import cv2
-import skimage
-from skimage import io
 import argparse
 
 TRAIN_EPOCHS = 100
@@ -177,7 +175,6 @@ def use_warp_maps(origins, targets):
     res_img = np.clip(res_img, -1, 1)
     res_img = ((res_img + 1) * 127.5).astype(np.uint8)
     cv2.imwrite("morph/maps.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
-    skimage.io.imshow(res_img)
 
     # apply maps and save results
 
@@ -207,7 +204,6 @@ def use_warp_maps(origins, targets):
         res_numpy = results.numpy()
 
         img = ((res_numpy + 1) * 127.5).astype(np.uint8)
-        skimage.io.imshow(np.squeeze(img))
         video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
         '''
         if (i + 1) % 10 == 0:
@@ -259,24 +255,17 @@ if __name__ == "__main__":
     add_first = args.add_first
     '''
 
-    #dom_a = cv2.imread(args.source, cv2.IMREAD_COLOR)
     dom_a = cv2.imread("Test_image_without_leak_scaled.png", cv2.IMREAD_COLOR)
     # Since the color order in cv2.imread is BGR (blue, green, red) the order of the ndarray is changed in RGB
     dom_a = cv2.cvtColor(dom_a, cv2.COLOR_BGR2RGB)
-    dom_a = cv2.resize(dom_a, (height, width), interpolation=cv2.INTER_AREA)
     dom_a = dom_a / 127.5 - 1
+    origins = dom_a.reshape(1, height, width, 3).astype(np.float32)
 
-    #dom_b = cv2.imread(args.target, cv2.IMREAD_COLOR)
     dom_b = cv2.imread("Test_image_scaled.png", cv2.IMREAD_COLOR)
     # Since the color order in cv2.imread is BGR (blue, green, red) the order of the ndarray is changed in RGB
     dom_b = cv2.cvtColor(dom_b, cv2.COLOR_BGR2RGB)
-    dom_b = cv2.resize(dom_b, (height, width), interpolation=cv2.INTER_AREA)
     dom_b = dom_b / 127.5 - 1
-
-    origins = dom_a.reshape(1, height, width, 3).astype(np.float32)
-    skimage.io.imshow(np.squeeze(origins))
     targets = dom_b.reshape(1, height, width, 3).astype(np.float32)
-    skimage.io.imshow(np.squeeze(targets))
 
     produce_warp_maps(origins, targets)
     use_warp_maps(origins, targets)
