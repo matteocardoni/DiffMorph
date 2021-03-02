@@ -116,7 +116,7 @@ def produce_warp_maps(origins, targets):
             self.conv2 = tf.keras.layers.Conv2D(64, (5, 5))
             self.act2 = tf.keras.layers.LeakyReLU(alpha=0.2)
             if binary_images:
-                self.convo = tf.keras.layers.Conv2D(1 + 1 + 2) * 2, (5,5)
+                self.convo = tf.keras.layers.Conv2D((1 + 1 + 2) * 2, (5,5))
             else:
                 self.convo = tf.keras.layers.Conv2D((3 + 3 + 2) * 2, (5, 5))
 
