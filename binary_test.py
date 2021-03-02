@@ -207,17 +207,16 @@ def produce_warp_maps(origins, targets):
             res_targets = ((res_targets.numpy() - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
             res_origins = ((res_origins.numpy() - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
             if binary_images:
-                print("BINARIZING")
                 # Binarize the images. Mininum value:0, maximum value: value_if_greater_than_threshold
                 res_targets = cv2.threshold(res_targets, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
                 res_origins = cv2.threshold(res_origins, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
                 # Save the images
-                cv2.imwrite("train/a_to_b_%d.png" % epoch, res_targets)
-                cv2.imwrite("train/b_to_a_%d.png" % epoch, res_origins)
+                cv2.imwrite("train/a_to_b_%s.png" % str(epoch), res_targets)
+                cv2.imwrite("train/b_to_a_%s.png" % str(epoch), res_origins)
             else:
                 # Save the image converting from RGB order to BGR order
-                cv2.imwrite("train/a_to_b_%d.jpg" % epoch, cv2.cvtColor(res_targets, cv2.COLOR_RGB2BGR))
-                cv2.imwrite("train/b_to_a_%d.jpg" % epoch, cv2.cvtColor(res_origins, cv2.COLOR_RGB2BGR))
+                cv2.imwrite("train/a_to_b_%s.jpg" % epoch, cv2.cvtColor(res_targets, cv2.COLOR_RGB2BGR))
+                cv2.imwrite("train/b_to_a_%s.jpg" % epoch, cv2.cvtColor(res_origins, cv2.COLOR_RGB2BGR))
 
             np.save('preds.npy', preds.numpy())
 
@@ -306,14 +305,14 @@ def use_warp_maps(origins, targets):
             # Convert the image frmo shape (1,heigth, width,1) to (heigth, width,1)
             img_squeezed = np.squeeze(img)
             # Save image
-            cv2.imwrite("morph/morph_images/image_%d.png" % i, img_squeezed)
+            cv2.imwrite("morph/morph_images/image_%s.png" % str(i), img_squeezed)
             # Write image to video
             video.write(img_squeezed)
         else:
             # Convert the image frmo shape (1,heigth, width, 3) to (heigth, width, 3)
             img_squeezed = np.squeeze(img)
             # Save image converting from RGB order to BGR order
-            cv2.imwrite("morph/morph_images/image_%d.jpg" % i, cv2.cvtColor(img_squeezed, cv2.COLOR_BGR2RGB))
+            cv2.imwrite("morph/morph_images/image_%s.jpg" % str(i), cv2.cvtColor(img_squeezed, cv2.COLOR_BGR2RGB))
             # Write image to video converting from RGB order to BGR order
             video.write(cv2.cvtColor(img_squeezed, cv2.COLOR_RGB2BGR))
         '''
