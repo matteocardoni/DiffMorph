@@ -14,6 +14,7 @@ binary_save_format = ".png"
 RGB_save_format = ".jpg"
 video_fps = 48
 video_format = 'mp4v'
+images_to_generate = 101
 
 binary_images = True
 TRAIN_EPOCHS = 100
@@ -208,8 +209,8 @@ def produce_warp_maps(origins, targets):
             if binary_images:
                 print("BINARIZING")
                 # Binarize the images. Mininum value:0, maximum value: value_if_greater_than_threshold
-                cv2.threshold(res_targets, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
-                cv2.threshold(res_origins, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+                res_targets = cv2.threshold(res_targets, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+                res_origins = cv2.threshold(res_origins, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
                 print("targets histogram: ",np.histogram(res_targets), "targets dtype: ", res_targets.dtype)
                 print("origins histogram: ",np.histogram(res_origins), "origins dtype: ", res_targets.dtype)
                 # Save the images
@@ -223,8 +224,6 @@ def produce_warp_maps(origins, targets):
             np.save('preds.npy', preds.numpy())
 
 def use_warp_maps(origins, targets):
-    STEPS = 101
-
     preds = np.load('preds.npy')
 
     if binary_images:
@@ -286,7 +285,7 @@ def use_warp_maps(origins, targets):
     res_img = np.zeros((im_sz * 3, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     '''
 
-    for i in range(STEPS):
+    for i in range(images_to_generate):
         preds_org = preds * org_strength[i]
         preds_trg = preds * trg_strength[i]
 
@@ -300,16 +299,25 @@ def use_warp_maps(origins, targets):
         results = res_targets * trg_strength[i] + res_origins * org_strength[i]
         res_numpy = results.numpy()
 
+
         # Convert to uint8
         img = ((res_numpy - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
         if binary_images:
             # Binarize
-            cv2.threshold(img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+            img = cv2.threshold(img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
+            # Convert the image frmo shape (1,heigth, width,1) to (heigth, width,1)
+            img_squeezed = np.squeeze(img)
+            # Save image
+            cv2.imwrite("morph/morph_images/image_%d.png" % i, img_squeezed)
             # Write image to video
-            video.write(np.squeeze(img))
+            video.write(img_squeezed)
         else:
+            # Convert the image frmo shape (1,heigth, width, 3) to (heigth, width, 3)
+            img_squeezed = np.squeeze(img)
+            # Save image converting from RGB order to BGR order
+            cv2.imwrite("morph/morph_images/image_%d.jpg" % i, cv2.cvtColor(img_squeezed, cv2.COLOR_BGR2RGB))
             # Write image to video converting from RGB order to BGR order
-            video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
+            video.write(cv2.cvtColor(img_squeezed, cv2.COLOR_RGB2BGR))
         '''
         if (i + 1) % 10 == 0:
             res_img[im_sz * 0:im_sz * 1, i // 10 * im_sz: (i // 10 + 1) * im_sz] = img
