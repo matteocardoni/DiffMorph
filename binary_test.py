@@ -165,7 +165,7 @@ def produce_warp_maps(origins, targets):
 
         train_loss(loss)
 
-    maps = create_grid(height,width)
+    maps = create_grid(height, width)
     maps = np.concatenate((maps, origins * 0.1, targets * 0.1), axis=-1).astype(np.float32)
 
     template = 'Epoch {}, Loss: {}'
@@ -371,8 +371,17 @@ if __name__ == "__main__":
     dom_a = dom_a / integer_to_float_scaling + integer_to_float_bias
     dom_b = dom_b / integer_to_float_scaling + integer_to_float_bias
     # Reshape and convert to float32
-    origins = np.expand_dims(dom_a, axis=0).astype(np.float32)
-    targets = np.expand_dims(dom_b, axis=0).astype(np.float32)
+    if binary_images:
+        # Convert shape from (height, width) to (height, width, 1)
+        dom_a = np.expand_dims(dom_a, axis=2)
+        dom_b = np.expand_dims(dom_b, axis=2)
+        # Convert shape from (heigth, width, 1) to (1, height, width, 1)
+        origins = np.expand_dims(dom_a, axis=0).astype(np.float32)
+        targets = np.expand_dims(dom_b, axis=0).astype(np.float32)
+    else:
+        # Convert shape from (heigth, width, 3) to (1, height, width, 3)
+        origins = np.expand_dims(dom_a, axis=0).astype(np.float32)
+        targets = np.expand_dims(dom_b, axis=0).astype(np.float32)
 
     produce_warp_maps(origins, targets)
     use_warp_maps(origins, targets)
