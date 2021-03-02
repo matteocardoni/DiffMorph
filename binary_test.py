@@ -10,8 +10,10 @@ image_size = (768,1024)
 height = image_size[0]
 width = image_size[1]
 
-#im_sz = 512
-mp_sz = 96
+# Map size
+map_size = (768,1024)
+map_height = map_size[0]
+map_width = map_size[1]
 
 warp_scale = 0.05
 mult_scale = 0.4
@@ -40,11 +42,11 @@ def warp(origins, targets, preds_org, preds_trg):
         res_targets = tfa.image.dense_image_warp(
             origins * tf.maximum(0.1, 1 + preds_org[:, :, :, 0:3] * mult_scale) + preds_org[:, :, :,
                                                                                   3:6] * 2 * add_scale,
-            preds_org[:, :, :, 6:8] * width * warp_scale)
+            preds_org[:, :, :, 6:8] * height * warp_scale)
         res_origins = tfa.image.dense_image_warp(
             targets * tf.maximum(0.1, 1 + preds_trg[:, :, :, 0:3] * mult_scale) + preds_trg[:, :, :,
                                                                                   3:6] * 2 * add_scale,
-            preds_trg[:, :, :, 6:8] * width * warp_scale)
+            preds_trg[:, :, :, 6:8] * height * warp_scale)
 
     return res_targets, res_origins
 
@@ -75,7 +77,7 @@ def produce_warp_maps(origins, targets):
             self.convo = tf.keras.layers.Conv2D((3 + 3 + 2) * 2, (5, 5))
 
         def call(self, maps):
-            x = tf.image.resize(maps, [mp_sz, mp_sz])
+            x = tf.image.resize(maps, [map_height, map_width])
             x = self.conv1(x)
             x = self.act1(x)
             x = self.conv2(x)
@@ -97,12 +99,12 @@ def produce_warp_maps(origins, targets):
             preds = tf.image.resize(preds, [height, width])
 
             # a = tf.random.uniform([maps.shape[0]])
-            # res_targets, res_origins = warp(origins, targets, preds[...,:8] * a, preds[...,8:] * (1 - a))
+            # res_targets, res_origins = warp(origins, targets, preds[..., :8] * a, preds[...,8:] * (1 - a))
             res_targets_, res_origins_ = warp(origins, targets, preds[..., :8], preds[..., 8:])
 
             res_map = tfa.image.dense_image_warp(maps, preds[:, :, :,
-                                                       6:8] * width * warp_scale)  # warp maps consistency checker
-            res_map = tfa.image.dense_image_warp(res_map, preds[:, :, :, 14:16] * width * warp_scale)
+                                                       6:8] * height * warp_scale)  # warp maps consistency checker
+            res_map = tfa.image.dense_image_warp(res_map, preds[:, :, :, 14:16] * height * warp_scale)
 
             loss = loss_object(maps, res_map) * 1 + loss_object(res_targets_, targets) * 0.3 + loss_object(res_origins_,
                                                                                                            origins) * 0.3
@@ -129,9 +131,7 @@ def produce_warp_maps(origins, targets):
             print("Epoch: ", epoch)
             preds = model(maps, training=False)[:1]
             preds = tf.image.resize(preds, [height, width])
-            preds_ndarray = preds.numpy()
-            test = origins * tf.maximum(0.1, 1 + preds[:, :, :, 0:3] * mult_scale)
-            test_test = test.numpy()
+            '''
             res_targets = tfa.image.dense_image_warp(
                 origins * tf.maximum(0.1, 1 + preds[:, :, :, 0:3] * mult_scale) + preds[:, :, :,
                                                                                       3:6] * 2 * add_scale,
@@ -142,8 +142,8 @@ def produce_warp_maps(origins, targets):
                 targets * tf.maximum(0.1, 1 + preds[:, :, :, 8:11] * mult_scale) + preds[:, :, :,
                                                                                       11:14] * 2 * add_scale,
                 preds[:, :, :, 14:16] * width * warp_scale)
-
-            #res_targets, res_origins = warp(origins, targets, preds[..., :8], preds[..., 8:])
+            '''
+            res_targets, res_origins = warp(origins, targets, preds[:, :, :, 0:8], preds[:, :, :, 8:16])
 
             res_targets = tf.clip_by_value(res_targets, -1, 1)[0]
             res_img = ((res_targets.numpy() + 1) * 127.5).astype(np.uint8)
@@ -254,23 +254,21 @@ if __name__ == "__main__":
     '''
 
     #dom_a = cv2.imread(args.source, cv2.IMREAD_COLOR)
-    dom_a = cv2.imread("Test_image_without_leak_scaled.png", cv2.IMREAD_COLOR)
+    dom_a = cv2.imread("Test_image_without_leak_scaled.png", cv2.IMREAD_COLOR)7
+    # Since the color order in cv2.imread is BGR (blue, green, red) the order of the ndarray is changed in RGB
     dom_a = cv2.cvtColor(dom_a, cv2.COLOR_BGR2RGB)
     dom_a = cv2.resize(dom_a, (height, width), interpolation=cv2.INTER_AREA)
-    #dom_a = cv2.resize(dom_a, (im_sz, im_sz), interpolation=cv2.INTER_AREA)
     dom_a = dom_a / 127.5 - 1
 
     #dom_b = cv2.imread(args.target, cv2.IMREAD_COLOR)
     dom_b = cv2.imread("Test_image_scaled.png", cv2.IMREAD_COLOR)
+    # Since the color order in cv2.imread is BGR (blue, green, red) the order of the ndarray is changed in RGB
     dom_b = cv2.cvtColor(dom_b, cv2.COLOR_BGR2RGB)
     dom_b = cv2.resize(dom_b, (height, width), interpolation=cv2.INTER_AREA)
-    #dom_b = cv2.resize(dom_b, (im_sz, im_sz), interpolation=cv2.INTER_AREA)
     dom_b = dom_b / 127.5 - 1
 
     origins = dom_a.reshape(1, height, width, 3).astype(np.float32)
-    #origins = dom_a.reshape(1, im_sz, im_sz, 3).astype(np.float32)
     targets = dom_b.reshape(1, height, width, 3).astype(np.float32)
-    #targets = dom_b.reshape(1, im_sz, im_sz, 3).astype(np.float32)
 
     produce_warp_maps(origins, targets)
     use_warp_maps(origins, targets)
