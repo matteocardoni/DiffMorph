@@ -299,19 +299,18 @@ def use_warp_maps(origins, targets):
 
         # Convert to uint8
         img = ((res_numpy - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
-        print(img.shape)
         if binary_images:
             # Binarize
             retVal, img = cv2.threshold(img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
             # Save image
-            cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img)
+            cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", np.squeeze(img))
             # Write image to video
-            video.write(img)
+            video.write(np.squeeze(img))
         else:
             # Save image converting from RGB order to BGR order
-            cv2.imwrite("morph/morph_images/image_" + str(i) + ".jpg", cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+            cv2.imwrite("morph/morph_images/image_" + str(i) + ".jpg", cv2.cvtColor(np.squeeze(img), cv2.COLOR_BGR2RGB))
             # Write image to video converting from RGB order to BGR order
-            video.write(cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
+            video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
         '''
         if (i + 1) % 10 == 0:
             res_img[im_sz * 0:im_sz * 1, i // 10 * im_sz: (i // 10 + 1) * im_sz] = img
