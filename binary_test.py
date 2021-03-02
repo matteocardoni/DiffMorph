@@ -3,7 +3,7 @@ import tensorflow as tf
 import tensorflow_addons as tfa
 import cv2
 import skimage
-from skimare import io
+from skimage import io
 import argparse
 
 TRAIN_EPOCHS = 100
