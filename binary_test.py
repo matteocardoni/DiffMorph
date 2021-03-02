@@ -254,7 +254,7 @@ if __name__ == "__main__":
     '''
 
     #dom_a = cv2.imread(args.source, cv2.IMREAD_COLOR)
-    dom_a = cv2.imread("Test_image_without_leak_scaled.png", cv2.IMREAD_COLOR)7
+    dom_a = cv2.imread("Test_image_without_leak_scaled.png", cv2.IMREAD_COLOR)
     # Since the color order in cv2.imread is BGR (blue, green, red) the order of the ndarray is changed in RGB
     dom_a = cv2.cvtColor(dom_a, cv2.COLOR_BGR2RGB)
     dom_a = cv2.resize(dom_a, (height, width), interpolation=cv2.INTER_AREA)
