@@ -9,7 +9,7 @@ import shutil
 # Parameters choice
 start_image = "Test_image_without_leak_scaled.png"
 end_image = "Test_image_scaled.png"
-binary_images = True
+binary_images = False
 image_size = (768, 1024)
 map_size = (768, 1024)
 integer_to_float_scaling = 127.5
