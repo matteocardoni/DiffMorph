@@ -210,12 +210,12 @@ def produce_warp_maps(origins, targets):
                 cv2.threshold(res_targets, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
                 cv2.threshold(res_origins, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
                 # Save the images
-                cv2.imwrite("train/a_to_b_%d" + binary_save_format % epoch, res_targets)
-                cv2.imwrite("train/b_to_a_%d" + binary_save_format % epoch, res_origins)
+                cv2.imwrite("train/a_to_b_%d.png" % epoch, res_targets)
+                cv2.imwrite("train/b_to_a_%d.png" % epoch, res_origins)
             else:
                 # Save the image converting from RGB order to BGR order
-                cv2.imwrite("train/a_to_b_%d" + RGB_save_format % epoch, cv2.cvtColor(res_targets, cv2.COLOR_RGB2BGR))
-                cv2.imwrite("train/b_to_a_%d" + RGB_save_format % epoch, cv2.cvtColor(res_origins, cv2.COLOR_RGB2BGR))
+                cv2.imwrite("train/a_to_b_%d.jpg" % epoch, cv2.cvtColor(res_targets, cv2.COLOR_RGB2BGR))
+                cv2.imwrite("train/b_to_a_%d.jpg" % epoch, cv2.cvtColor(res_origins, cv2.COLOR_RGB2BGR))
 
             np.save('preds.npy', preds.numpy())
 
@@ -245,7 +245,7 @@ def use_warp_maps(origins, targets):
         # Binarize
         cv2.threshold(res_img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
         # Save
-        cv2.imwrite("morph/maps" + binary_save_format, res_img)
+        cv2.imwrite("morph/maps.png", res_img)
     else:
         # save maps as images
         res_img = np.zeros((height * 2, width * 3, 3))
@@ -259,7 +259,7 @@ def use_warp_maps(origins, targets):
         res_img[height * 1:height * 2, width * 2:width * 3, :2] = preds[0, :, :, 14:16]  # b_to_a warp map
 
         # Save
-        cv2.imwrite("morph/maps" + RGB_save_format, cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
+        cv2.imwrite("morph/maps.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
 
     # apply maps and save results
 
