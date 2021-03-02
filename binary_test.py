@@ -275,7 +275,10 @@ def use_warp_maps(origins, targets):
     # Set the video format
     fourcc = cv2.VideoWriter_fourcc(* video_format)
     # Settings for the video. width must be the first argument for the shape
-    video = cv2.VideoWriter('morph/morph.mp4', fourcc, video_fps, (width, height))
+    if binary_images:
+        video = cv2.VideoWriter('morph/morph.mp4', fourcc, video_fps, (width, height), isColor=False)
+    else:
+        video = cv2.VideoWriter('morph/morph.mp4', fourcc, video_fps, (width, height), isColor = True)
     '''
     img_a = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
     img_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
