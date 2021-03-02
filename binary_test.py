@@ -2,6 +2,8 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_addons as tfa
 import cv2
+import skimage
+from skimare import io
 import argparse
 
 TRAIN_EPOCHS = 100
@@ -175,6 +177,7 @@ def use_warp_maps(origins, targets):
     res_img = np.clip(res_img, -1, 1)
     res_img = ((res_img + 1) * 127.5).astype(np.uint8)
     cv2.imwrite("morph/maps.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
+    skimage.io.imshow(res_img)
 
     # apply maps and save results
 
@@ -202,7 +205,8 @@ def use_warp_maps(origins, targets):
         results = res_targets * trg_strength + res_origins * org_strength
         res_numpy = results.numpy()
 
-        img = ((res_numpy[i] + 1) * 127.5).astype(np.uint8)
+        img = ((res_numpy + 1) * 127.5).astype(np.uint8)
+        skimage.io.imshow(img)
         video.write(cv2.cvtColor(img, cv2.COLOR_RGB2BGR))
         '''
         if (i + 1) % 10 == 0:
