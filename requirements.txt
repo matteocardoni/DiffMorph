@@ -2,4 +2,3 @@ numpy
 tensorflow
 tensorflow-addons
 opencv-python
-shutil
