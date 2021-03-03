@@ -24,7 +24,9 @@ warp_scale = 0.005
 mult_scale = 0.0
 add_scale = 0.0
 add_first = False
-
+targets_loss_weight = 0.3
+origins_loss_weight = 0.3
+maps_loss_weight = 3
 
 height = image_size[0]
 width = image_size[1]
@@ -154,8 +156,7 @@ def produce_warp_maps(origins, targets):
                                                            6:8] * height * warp_scale)  # warp maps consistency checker
                 res_map = tfa.image.dense_image_warp(res_map, preds[:, :, :, 14:16] * height * warp_scale)
 
-            loss = loss_object(maps, res_map) * 1 + loss_object(res_targets_, targets) * 0.3 + loss_object(res_origins_,
-                                                                                                           origins) * 0.3
+            loss = loss_object(maps, res_map) * maps_loss_weight + loss_object(res_targets_, targets) * targets_loss_weight + loss_object(res_origins_, origins) * origins_loss_weight
 
         gradients = tape.gradient(loss, model.trainable_variables)
         optimizer.apply_gradients(zip(gradients, model.trainable_variables))
