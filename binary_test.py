@@ -9,12 +9,12 @@ import shutil
 # Parameters choice
 start_image = "Test_image_without_leak_scaled.png"
 end_image = "Test_image_scaled.png"
-binary_images = False
+binary_images = True
 image_size = (768, 1024)
 map_size = (768, 1024)
 integer_to_float_scaling = 127.5
 integer_to_float_bias = -1
-binary_threshold = 200  #in scale [0,255]
+binary_threshold = 250  #in scale [0,255]
 value_if_greater_than_threshold = 255
 video_fps = 48
 video_format = 'mp4v'
