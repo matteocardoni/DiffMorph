@@ -180,18 +180,7 @@ def produce_warp_maps(origins, targets):
             print("Epoch: ", epoch)
             preds = model(maps, training=False)[:1]
             preds = tf.image.resize(preds, [height, width])
-            '''
-            res_targets = tfa.image.dense_image_warp(
-                origins * tf.maximum(0.1, 1 + preds[:, :, :, 0:3] * mult_scale) + preds[:, :, :,
-                                                                                      3:6] * 2 * add_scale,
-                preds[:, :, :, 6:8] * width * warp_scale)
-            res_targets_ndarray = res_targets.numpy()
 
-            res_origins = tfa.image.dense_image_warp(
-                targets * tf.maximum(0.1, 1 + preds[:, :, :, 8:11] * mult_scale) + preds[:, :, :,
-                                                                                      11:14] * 2 * add_scale,
-                preds[:, :, :, 14:16] * width * warp_scale)
-            '''
             if binary_images:
                 res_targets, res_origins = warp(origins, targets, preds[:, :, :, 0:4], preds[:, :, :, 4:8])
             else:
@@ -218,48 +207,9 @@ def produce_warp_maps(origins, targets):
             np.save('preds.npy', preds.numpy())
 
 def use_warp_maps(origins, targets):
+
+    # Load predictions file
     preds = np.load('preds.npy')
-
-    if binary_images:
-        '''
-        # save maps as images
-        res_img = np.zeros((height * 2, width * 3, 1))
-
-        res_img[height * 0:height * 1, width * 0:width * 1] = preds[0, :, :, 0:1]  # a_to_b add map
-        res_img[height * 0:height * 1, width * 1:width * 2] = preds[0, :, :, 1:2]  # a_to_b mult map
-        res_img[height * 0:height * 1, width * 2:width * 3, :2] = preds[0, :, :, 2:4]  # a_to_b warp map
-
-        res_img[height * 1:height * 2, width * 0:width * 1] = preds[0, :, :, 4:5]  # b_to_a add map
-        res_img[height * 1:height * 2, width * 1:width * 2] = preds[0, :, :, 5:6]  # b_to_a mult map
-        res_img[height * 1:height * 2, width * 2:width * 3, :2] = preds[0, :, :, 6:8]  # b_to_a warp map
-
-        # Clip for values outside [-1,1]
-        res_img = np.clip(res_img, -1, 1)
-        # Convert to uint8
-        res_img = ((res_img - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
-        # Binarize
-        cv2.threshold(res_img, binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
-        # Save
-        cv2.imwrite("morph/maps.png", res_img)
-    else:
-        # save maps as images
-        res_img = np.zeros((height * 2, width * 3, 3))
-
-        res_img[height * 0:height * 1, width * 0:width * 1] = preds[0, :, :, 0:3]  # a_to_b add map
-        res_img[height * 0:height * 1, width * 1:width * 2] = preds[0, :, :, 3:6]  # a_to_b mult map
-        res_img[height * 0:height * 1, width * 2:width * 3, :2] = preds[0, :, :, 6:8]  # a_to_b warp map
-
-        res_img[height * 1:height * 2, width * 0:width * 1] = preds[0, :, :, 8:11]  # b_to_a add map
-        res_img[height * 1:height * 2, width * 1:width * 2] = preds[0, :, :, 11:14]  # b_to_a mult map
-        res_img[height * 1:height * 2, width * 2:width * 3, :2] = preds[0, :, :, 14:16]  # b_to_a warp map
-
-        # Clip for values outside [-1,1]
-        res_img = np.clip(res_img, -1, 1)
-        # Convert to uint8
-        res_img = ((res_img - integer_to_float_bias) * integer_to_float_scaling).astype(np.uint8)
-        # Save
-        cv2.imwrite("morph/maps.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
-        '''
     # apply maps and save results
 
     org_strength = tf.reshape(tf.range(images_to_generate, dtype=tf.float32), [images_to_generate, 1, 1, 1]) / (images_to_generate - 1)
@@ -272,12 +222,6 @@ def use_warp_maps(origins, targets):
         video = cv2.VideoWriter('morph/morph.mp4', fourcc, video_fps, (width, height), isColor=False)
     else:
         video = cv2.VideoWriter('morph/morph.mp4', fourcc, video_fps, (width, height), isColor=True)
-    '''
-    img_a = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
-    img_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
-    img_a_b = np.zeros((im_sz, im_sz * (STEPS // 10), 3), dtype=np.uint8)
-    res_img = np.zeros((im_sz * 3, im_sz * (STEPS // 10), 3), dtype=np.uint8)
-    '''
 
     for i in range(images_to_generate):
         preds_org = preds * org_strength[i]
@@ -308,17 +252,7 @@ def use_warp_maps(origins, targets):
             cv2.imwrite("morph/morph_images/image_" + str(i) + ".jpg", cv2.cvtColor(np.squeeze(img), cv2.COLOR_BGR2RGB))
             # Write image to video converting from RGB order to BGR order
             video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
-        '''
-        if (i + 1) % 10 == 0:
-            res_img[im_sz * 0:im_sz * 1, i // 10 * im_sz: (i // 10 + 1) * im_sz] = img
-            res_img[im_sz * 1:im_sz * 2, i // 10 * im_sz: (i // 10 + 1) * im_sz] = (
-                        (res_targets.numpy()[0] + 1) * 127.5).astype(np.uint8)
-            res_img[im_sz * 2:im_sz * 3, i // 10 * im_sz: (i // 10 + 1) * im_sz] = (
-                        (res_origins.numpy()[0] + 1) * 127.5).astype(np.uint8)
-            print('Image #%d produced.' % (i + 1))
-        
-    cv2.imwrite("morph/result.jpg", cv2.cvtColor(res_img, cv2.COLOR_RGB2BGR))
-    '''
+
     shutil.make_archive("morph/morph_images", 'zip', "morph/morph_images/")
     print("Images zip folder created")
     cv2.destroyAllWindows()
@@ -328,39 +262,6 @@ def use_warp_maps(origins, targets):
 
 
 if __name__ == "__main__":
-    # Parser for command line options
-    '''
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--source", help="Source file name", default=None)
-    parser.add_argument("-t", "--target", help="Target file name", default=None)
-    parser.add_argument("-e", "--train_epochs", help="Number of epochs to train network", default=TRAIN_EPOCHS,
-                        type=int)
-    parser.add_argument("-a", "--add_scale", help="Scaler for addition map", default=add_scale, type=float)
-    parser.add_argument("-m", "--mult_scale", help="Scaler for multiplication map", default=mult_scale, type=float)
-    parser.add_argument("-w", "--warp_scale", help="Scaler for warping map", default=warp_scale, type=float)
-    parser.add_argument("-add_first", "--add_first", help="Should you add or multiply maps first", default=add_first,
-                        type=bool)
-
-    args = parser.parse_args()
-
-    if not args.source:
-        print("No source file provided!")
-        exit()
-
-    if not args.target:
-        print("No target file provided!")
-        exit()
-    '''
-
-    #TRAIN_EPOCHS = args.train_epochs
-
-    '''
-    add_scale = args.add_scale
-    mult_scale = args.mult_scale
-    warp_scale = args.warp_scale
-    add_first = args.add_first
-    '''
-
     # Load the images
     if binary_images:
         dom_a = cv2.imread(start_image, cv2.IMREAD_GRAYSCALE)
