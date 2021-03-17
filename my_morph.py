@@ -222,6 +222,14 @@ def use_warp_maps(origins, targets):
     else:
         video = cv2.VideoWriter('morph/morph.mp4', fourcc, video_fps, (width, height), isColor=True)
 
+    # Create the folder for the images
+    try:
+        os.makedirs("morph/morph_images")
+        print("Creation of the folder morph/morph/images")
+    except FileExistsError:
+        print("The folder morph/morph_images has not been created because it already exists")
+
+
     for i in range(images_to_generate):
         preds_org = preds * org_strength[i]
         preds_trg = preds * trg_strength[i]
@@ -243,11 +251,6 @@ def use_warp_maps(origins, targets):
             # Binarize
             retVal, img = cv2.threshold(np.squeeze(img), binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
             # Save image
-            try:
-                os.makedirs("morph/morph_images")
-                print("Creation of the folder morph/morph/images")
-            except FileExistsError:
-                print("The folder morph/morph_images has not been created because it already exists")
 
             cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img)
             # Write image to video
