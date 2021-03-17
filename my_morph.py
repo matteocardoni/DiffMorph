@@ -8,12 +8,10 @@ import argparse
 
 
 # Parameters choice
-start_image = "Test_image_without_leak_scaled.png"
-end_image = "Test_image_scaled.png"
 binary_images = True
 image_size = (768, 1024)
 map_size = (768, 1024)
-integer_to_float_scaling = np.float(1)
+integer_to_float_scaling = 1
 integer_to_float_bias = 0
 binary_threshold = 0.95  #in scale [0,1]
 value_if_greater_than_threshold = 1
@@ -245,6 +243,12 @@ def use_warp_maps(origins, targets):
             # Binarize
             retVal, img = cv2.threshold(np.squeeze(img), binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
             # Save image
+            try:
+                os.makedirs("morph/morph_images")
+                print("Creation of the folder morph/morph/images")
+            except FileExistsError:
+                print("The folder morph/morph_images has not been created because it already exists")
+
             cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img)
             # Write image to video
             video.write(img)
