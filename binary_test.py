@@ -4,6 +4,7 @@ import tensorflow_addons as tfa
 import cv2
 import os
 import shutil
+import argparse
 
 
 # Parameters choice
@@ -12,10 +13,10 @@ end_image = "Test_image_scaled.png"
 binary_images = True
 image_size = (768, 1024)
 map_size = (768, 1024)
-integer_to_float_scaling = 127.5
-integer_to_float_bias = -1
-binary_threshold = 250  #in scale [0,255]
-value_if_greater_than_threshold = 255
+integer_to_float_scaling = 1
+integer_to_float_bias = 0
+binary_threshold = 0.95  #in scale [0,1]
+value_if_greater_than_threshold = 1
 video_fps = 48
 video_format = 'mp4v'
 images_to_generate = 100
@@ -262,13 +263,39 @@ def use_warp_maps(origins, targets):
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-s", "--source", help="Source file name", default=None)
+    parser.add_argument("-t", "--target", help="Target file name", default=None)
+    parser.add_argument("-e", "--train_epochs", help="Number of epochs to train network", default=TRAIN_EPOCHS,
+                        type=int)
+    parser.add_argument("-a", "--add_scale", help="Scaler for addition map", default=add_scale, type=float)
+    parser.add_argument("-m", "--mult_scale", help="Scaler for multiplication map", default=mult_scale, type=float)
+    parser.add_argument("-w", "--warp_scale", help="Scaler for warping map", default=warp_scale, type=float)
+    parser.add_argument("-add_first", "--add_first", help="Should you add or multiply maps first", default=add_first,
+                        type=bool)
+
+    args = parser.parse_args()
+
+    if not args.source:
+        print("No source file provided!")
+        exit()
+
+    if not args.target:
+        print("No target file provided!")
+        exit()
+
+    TRAIN_EPOCHS = args.train_epochs
+    add_scale = args.add_scale
+    mult_scale = args.mult_scale
+    warp_scale = args.warp_scale
+    add_first = args.add_first
     # Load the images
     if binary_images:
-        dom_a = cv2.imread(start_image, cv2.IMREAD_GRAYSCALE)
-        dom_b = cv2.imread(end_image, cv2.IMREAD_GRAYSCALE)
+        dom_a = cv2.imread(args.source, cv2.IMREAD_GRAYSCALE)
+        dom_b = cv2.imread(args.target, cv2.IMREAD_GRAYSCALE)
     else:
-        dom_a = cv2.imread(start_image, cv2.IMREAD_COLOR)
-        dom_b = cv2.imread(end_image, cv2.IMREAD_COLOR)
+        dom_a = cv2.imread(args.source, cv2.IMREAD_COLOR)
+        dom_b = cv2.imread(args.target, cv2.IMREAD_COLOR)
         # Since the color order in cv2.imread is BGR (blue, green, red) the order of the ndarray is changed in RGB
         dom_a = cv2.cvtColor(dom_a, cv2.COLOR_BGR2RGB)
         dom_b = cv2.cvtColor(dom_b, cv2.COLOR_BGR2RGB)
