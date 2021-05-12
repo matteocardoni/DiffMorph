@@ -253,16 +253,17 @@ def use_warp_maps(origins, targets):
             # Binarize
             retVal, img = cv2.threshold(np.squeeze(img), binary_threshold, value_if_greater_than_threshold, cv2.THRESH_BINARY)
             # Save image
-
             cv2.imwrite("morph/morph_images/image_" + str(i) + ".png", img)
             # Write image to video
-            video.write(img)
-        else:
-            # Save image converting from RGB order to BGR order
-            cv2.imwrite("morph/morph_images/image_" + str(i) + ".jpg", cv2.cvtColor(np.squeeze(img), cv2.COLOR_BGR2RGB))
             # Scale image for video
             if scale_images_for_video:
                 img_scaled_for_video = img * video_scale_ratio
+                video.write(img_scaled_for_video)
+            else:
+                video.write(img)
+        else:
+            # Save image converting from RGB order to BGR order
+            cv2.imwrite("morph/morph_images/image_" + str(i) + ".jpg", cv2.cvtColor(np.squeeze(img), cv2.COLOR_BGR2RGB))
             # Write image to video converting from RGB order to BGR order
             video.write(cv2.cvtColor(np.squeeze(img_scaled_for_video), cv2.COLOR_RGB2BGR))
 
