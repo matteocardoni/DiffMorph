@@ -26,6 +26,8 @@ add_first = True
 targets_loss_weight = 1
 origins_loss_weight = 2
 maps_loss_weight = 1
+scale_images_for_video = True
+video_scale_ratio = 255
 
 height = image_size[0]
 width = image_size[1]
@@ -258,8 +260,11 @@ def use_warp_maps(origins, targets):
         else:
             # Save image converting from RGB order to BGR order
             cv2.imwrite("morph/morph_images/image_" + str(i) + ".jpg", cv2.cvtColor(np.squeeze(img), cv2.COLOR_BGR2RGB))
+            # Scale image for video
+            if scale_images_for_video:
+                img_scaled_for_video = img * video_scale_ratio
             # Write image to video converting from RGB order to BGR order
-            video.write(cv2.cvtColor(np.squeeze(img), cv2.COLOR_RGB2BGR))
+            video.write(cv2.cvtColor(np.squeeze(img_scaled_for_video), cv2.COLOR_RGB2BGR))
 
     shutil.make_archive("morph/morph_images", 'zip', "morph/morph_images/")
     print("Images zip folder created")
